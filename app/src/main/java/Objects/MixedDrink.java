@@ -22,4 +22,15 @@ public class MixedDrink {
     public String getRecipe() {
         return recipe;
     }
+
+    @Override
+    public String toString() {
+        String[] temp = recipe.split(", ");
+        String rtn = name + "\n";
+        for(String string : temp) {
+            rtn += string + "\n";
+        }
+        rtn = rtn.substring(0, rtn.length() - 1);
+        return rtn;
+    }
 }

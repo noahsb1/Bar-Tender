@@ -13,5 +13,7 @@ public class FileInitializerTest {
     public void test() throws FileNotFoundException {
         ArrayList<MixedDrink> temp = FileLoader.fileLoaderInitializer();
         assertEquals(temp.get(0).getName(), "pina colada");
+        assertEquals(temp.get(0).getIngredients(), "rum, coke, cock");
+        assertEquals(temp.get(0).getRecipe(), "1/2 cup rum, 1/4 cup rum");
     }
 }
