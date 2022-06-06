@@ -1,12 +1,15 @@
 package Screens;
 
 import Objects.MixedDrink;
-import Utilities.FileLoader;
+import Utilities.GitAccess;
+import android.os.AsyncTask;
+import android.widget.Button;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.bartender.R;
 
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class Inventory extends AppCompatActivity {
@@ -17,18 +20,39 @@ public class Inventory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
 
-        addDrinks();
+        drinkObjects = new ArrayList<>();
+        gitCall gitCall = new gitCall();
+        gitCall.execute();
 
+        TextView text = findViewById(R.id.textView2);
+        Button testbutton = findViewById(R.id.testButton);
+
+        testbutton.setOnClickListener(view -> {
+            gitCall.cancel(true);
+            text.setText(drinkObjects.get(1).getName());
+        });
     }
 
     /**
-     * Converts drink text files into drink objects
+     * AsyncTask to look at github and pull drink menu
      */
-    private void addDrinks() {
-        try {
-            drinkObjects = FileLoader.fileLoaderInitializer();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+    private class gitCall extends AsyncTask<Void, Void, String[]> {
+        @Override
+        protected String[] doInBackground(Void... params) {
+            try {
+                return GitAccess.access();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String[] string) {
+            for (String drink : string) {
+                String[] temp2 = drink.split(";");
+                drinkObjects.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
+            }
         }
     }
 }
