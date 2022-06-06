@@ -12,7 +12,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private ArrayList<MixedDrink> drinkObjects;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,9 +25,4 @@ public class MainActivity extends AppCompatActivity {
             this.finish();
         });
     }
-
-    /**
-     * Converts drink text files into drink objects
-     */
-
 }

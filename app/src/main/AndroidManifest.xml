@@ -10,6 +10,9 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.BarTender">
         <activity
+                android:name="Screens.Inventory"
+                android:exported="true"/>
+        <activity
                 android:name="Screens.MainActivity"
                 android:exported="true">
             <intent-filter>
