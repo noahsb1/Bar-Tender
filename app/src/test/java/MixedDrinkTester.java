@@ -1,5 +1,3 @@
-package com.example.bartender;
-
 import Objects.MixedDrink;
 import org.junit.Test;
 import static org.junit.Assert.*;
