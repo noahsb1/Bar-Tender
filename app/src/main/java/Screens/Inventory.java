@@ -2,6 +2,7 @@ package Screens;
 
 import Objects.MixedDrink;
 import Utilities.GitAccess;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,15 +22,22 @@ public class Inventory extends AppCompatActivity {
         setContentView(R.layout.activity_inventory);
 
         drinkObjects = new ArrayList<>();
+        Button backButton = findViewById(R.id.backButton);
+        Button mixedDrinkFinder = findViewById(R.id.mixedDrinkFinder);
+        Button addToInventory = findViewById(R.id.addToInventory);
         gitCall gitCall = new gitCall();
         gitCall.execute();
 
-        TextView text = findViewById(R.id.textView2);
-        Button testbutton = findViewById(R.id.testButton);
+        backButton.setOnClickListener(view -> {
+            Intent intent = new Intent(Inventory.this, MainActivity.class);
+            startActivity(intent);
+            this.finish();
+        });
 
-        testbutton.setOnClickListener(view -> {
-            gitCall.cancel(true);
-            text.setText(drinkObjects.get(1).getName());
+        addToInventory.setOnClickListener(view -> {
+            Intent intent = new Intent(Inventory.this, LiquorSelect.class);
+            startActivity(intent);
+            this.finish();
         });
     }
 
@@ -40,7 +48,7 @@ public class Inventory extends AppCompatActivity {
         @Override
         protected String[] doInBackground(Void... params) {
             try {
-                return GitAccess.access();
+                return GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text Files/drinks.txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }
