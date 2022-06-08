@@ -47,13 +47,8 @@
                 android:layout_height="0dp" android:layout_weight="7">
             <androidx.recyclerview.widget.RecyclerView
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" android:layout_weight="1"/>
-            <androidx.gridlayout.widget.GridLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:id="@+id/liquorListLayout" app:columnCount="1"
-                    app:rowCount="1" android:layout_weight="1">
-
-            </androidx.gridlayout.widget.GridLayout>
+                    android:layout_height="match_parent" android:layout_weight="1"
+                    android:id="@+id/liquorRecyclerView"/>
         </LinearLayout>
         <LinearLayout
                 android:orientation="horizontal"
