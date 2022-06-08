@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.GridLayout;
+import androidx.gridlayout.widget.GridLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.bartender.R;
@@ -26,7 +26,7 @@ public class LiquorSelect extends AppCompatActivity {
 
         Bundle extras = getIntent().getExtras();
         liquorListLayout = findViewById(R.id.liquorListLayout);
-        liquors = (ArrayList<String>) extras.get("liquor");
+        liquors = (ArrayList<String>) extras.get("liquors");
         Button backButton = findViewById(R.id.backButton2);
 
         setupList(this);
@@ -45,11 +45,14 @@ public class LiquorSelect extends AppCompatActivity {
             buttonParams.height = 0;
             buttonParams.width = 0;
             buttonParams.rowSpec = GridLayout.spec(i, (float) 1);
-            buttonParams.columnSpec = GridLayout.spec(1, (float) 1);
+            buttonParams.columnSpec = GridLayout.spec(0, (float) 1);
 
             CheckBox checkBox = new CheckBox(context);
             checkBox.setId(i);
             checkBox.setLayoutParams(buttonParams);
+            checkBox.setText(liquors.get(i));
+
+            liquorListLayout.addView(checkBox);
         }
     }
 }

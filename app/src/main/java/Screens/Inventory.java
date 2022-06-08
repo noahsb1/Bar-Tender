@@ -54,7 +54,7 @@ public class Inventory extends AppCompatActivity {
             try {
                 ArrayList<String[]> rtn = new ArrayList<>();
                 String[] temp1 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/drinks.txt");
-                String[] temp2 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/liquors.txt");
+                String[] temp2 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/liquorList.txt");
                 rtn.add(temp1);
                 rtn.add(temp2);
 
@@ -73,7 +73,9 @@ public class Inventory extends AppCompatActivity {
                 String[] temp2 = drink.split(";");
                 drinkObjects.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
             }
-            liquors.addAll(Arrays.asList(liquorArray));
+            for (String liquor: liquorArray) {
+                liquors.add(liquor);
+            }
         }
     }
 }
