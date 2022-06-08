@@ -21,7 +21,7 @@ import java.util.Collections;
 
 public class Inventory extends AppCompatActivity {
     private ArrayList<MixedDrink> drinkObjects;
-    private ArrayList<String> liquors;
+    private ArrayList<String> liquorsOnline;
     private ArrayList<String> liquorsInInventory;
     private RecycleViewAdapter adapter;
 
@@ -32,7 +32,7 @@ public class Inventory extends AppCompatActivity {
 
         // Initialize variables and copy inventory from memory
         drinkObjects = new ArrayList<>();
-        liquors = new ArrayList<>();
+        liquorsOnline = new ArrayList<>();
         liquorsInInventory = new ArrayList<>();
         try {
             String[] temp = InternalMemory.getStoredInventory(this).split("!");
@@ -68,7 +68,7 @@ public class Inventory extends AppCompatActivity {
         addToInventory.setOnClickListener(view -> {
             Intent intent = new Intent(Inventory.this, LiquorSelect.class);
             gitCall.cancel(true);
-            intent.putExtra("liquors", liquors);
+            intent.putExtra("liquors", liquorsOnline);
             intent.putExtra("inventory", liquorsInInventory);
             startActivity(intent);
             this.finish();
@@ -104,7 +104,7 @@ public class Inventory extends AppCompatActivity {
                 drinkObjects.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
             }
             for (String liquor: liquorArray) {
-                liquors.add(liquor);
+                liquorsOnline.add(liquor);
             }
         }
     }
