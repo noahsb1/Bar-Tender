@@ -10,18 +10,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 
 public class Inventory extends AppCompatActivity {
     private ArrayList<MixedDrink> drinkObjects;
-    private ArrayList<String> liquorsOnline;
+    private HashMap<String, List<String>> liquorsOnline;
     private ArrayList<String> liquorsInInventory;
     private RecycleViewAdapter adapter;
 
@@ -32,7 +31,7 @@ public class Inventory extends AppCompatActivity {
 
         // Initialize variables and copy inventory from memory
         drinkObjects = new ArrayList<>();
-        liquorsOnline = new ArrayList<>();
+        liquorsOnline = new HashMap<>();
         liquorsInInventory = new ArrayList<>();
         try {
             String[] temp = InternalMemory.getStoredInventory(this).split("!");
@@ -50,12 +49,22 @@ public class Inventory extends AppCompatActivity {
         gitCall gitCall = new gitCall();
         gitCall.execute();
 
+        // Creates viewTypes array for Recycler Table
+        ArrayList<Integer> temp = new ArrayList<>();
+        for (int i = 0; i < liquorsInInventory.size(); i++) {
+            temp.add(2);
+        }
+
         // Sort liquor list alphabetically and initialize recycler view
         Collections.sort(this.liquorsInInventory);
         RecyclerView recyclerView = findViewById(R.id.inventoryRecyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new RecycleViewAdapter(liquorsInInventory, liquorsInInventory, 1);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new RecycleViewAdapter(liquorsInInventory, liquorsInInventory, temp);
         recyclerView.setAdapter(adapter);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                                                                                layoutManager.getOrientation());
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
@@ -103,8 +112,13 @@ public class Inventory extends AppCompatActivity {
                 String[] temp2 = drink.split(";");
                 drinkObjects.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
             }
+
             for (String liquor: liquorArray) {
-                liquorsOnline.add(liquor);
+                String[] temp = liquor.split(":");
+                String category = temp[0];
+                String[] drinksInCategory = temp[1].split(";");
+                Arrays.sort(drinksInCategory);
+                liquorsOnline.put(category, Arrays.asList(drinksInCategory));
             }
         }
     }
