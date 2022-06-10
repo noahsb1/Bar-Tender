@@ -47,6 +47,9 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else if (viewType == 2) {
             View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_rowtextbox, parent, false);
             return new NormalTextBoxViewHolder(rowItem);
+        } else if (viewType == 3) {
+            View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_row, parent, false);
+            return new MegaViewHolder(rowItem);
         } else {
             return null;
         }
@@ -81,6 +84,17 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else if (holder instanceof NormalTextBoxViewHolder) {
             NormalTextBoxViewHolder normalTextBoxHolder = (NormalTextBoxViewHolder) holder;
             normalTextBoxHolder.textView.setText(this.data.get(position));
+        } else if (holder instanceof  MegaViewHolder) {
+            MegaViewHolder megaViewHolder = (MegaViewHolder) holder;
+            megaViewHolder.categoryHeader.setText(this.data.get(position));
+
+            RecyclerView recyclerView = megaViewHolder.subCategoryHolder;
+            LinearLayoutManager layoutManager = new LinearLayoutManager();
+            recyclerView.setLayoutManager(layoutManager);
+            adapter = new RecycleViewAdapter(liquorsInInventory, liquorsInInventory, temp);
+            recyclerView.setAdapter(adapter);
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                                                                                    layoutManager.getOrientation());
         }
     }
 
@@ -99,6 +113,17 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         public CategoryHeaderViewHolder(View view) {
             super(view);
             this.textView = view.findViewById(R.id.textBoxCategoryHeader);
+        }
+    }
+
+    public static class MegaViewHolder extends RecyclerView.ViewHolder {
+        private TextView categoryHeader;
+        private RecyclerView subCategoryHolder;
+
+        public MegaViewHolder(View view) {
+            super(view);
+            this.categoryHeader = view.findViewById(R.id.textBoxCategoryHeader2);
+            this.subCategoryHolder = view.findViewById(R.id.nestedRecyclerView);
         }
     }
 
