@@ -1,11 +1,11 @@
 package Screens;
 
 import Utilities.InternalMemory;
-import Utilities.RecycleViewAdapter;
+import Utilities.RecycleViewAdapters.ParentRecycleViewAdapter;
+import Utilities.RecycleViewAdapters.RecycleViewAdapter;
 import android.content.Intent;
-import android.view.View;
+import android.view.MotionEvent;
 import android.widget.Button;
-import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -17,9 +17,9 @@ import java.io.IOException;
 import java.util.*;
 
 public class LiquorSelect extends AppCompatActivity {
-    private HashMap<String, List<String>> liquorsOnline;
-    private RecycleViewAdapter adapter;
-    private ArrayList<String> liquorsInInventory;
+    private HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline;
+    private ParentRecycleViewAdapter   adapter;
+    private ArrayList<String> liquorsList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,33 +28,56 @@ public class LiquorSelect extends AppCompatActivity {
 
         // Initialize variables and copy inventory
         Bundle extras = getIntent().getExtras();
-        liquorsOnline = (HashMap<String, List<String>>) extras.get("liquors");
-        liquorsInInventory = (ArrayList<String>) extras.get("inventory");
+        liquorsOnline = (HashMap<String, HashMap<String, ArrayList<String>>>) extras.get("liquors");
+        liquorsList = (ArrayList<String>) extras.get("list");
         Button backButton = findViewById(R.id.backButton2);
         Button updateButton = findViewById(R.id.executeAddToInventory);
 
-        // Liquor Hashmap translated into string Array to be displayed
-        ArrayList<String> liquorsOnlineAsList = new ArrayList<>();
-        ArrayList<Integer> viewTypes = new ArrayList<>();
-        Set<String> keys = liquorsOnline.keySet();
-        Object[] temp = keys.toArray();
-        for (Object key : temp) {
-            liquorsOnlineAsList.add(key + ":");
-            viewTypes.add(0);
-            for (String liquorBrand : liquorsOnline.get(key)) {
-                liquorsOnlineAsList.add(liquorBrand);
-                viewTypes.add(1);
-            }
+        Set<String> temp = liquorsOnline.keySet();
+        Object[] hashMapKeysArray = temp.toArray();
+        ArrayList<String> hashMapKey = new ArrayList<>();
+        for (Object str : hashMapKeysArray) {
+            hashMapKey.add((String) str);
+        }
+        ArrayList<Integer> rowTypes = new ArrayList<>();
+        for (int i = 0; i < liquorsOnline.size(); i++) {
+            rowTypes.add(0);
         }
 
         // Sort liquor list alphabetically and initialize recycler view
         RecyclerView recyclerView = findViewById(R.id.liquorRecyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new RecycleViewAdapter(liquorsOnlineAsList, liquorsInInventory, viewTypes);
+        adapter = new ParentRecycleViewAdapter(liquorsOnline, rowTypes, hashMapKey, this);
         recyclerView.setAdapter(adapter);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
+
+
+        RecyclerView.OnItemTouchListener mScrollTouchListener = new RecyclerView.OnItemTouchListener() {
+            @Override
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+                int action = e.getAction();
+                switch (action) {
+                case MotionEvent.ACTION_MOVE:
+                    rv.getParent().requestDisallowInterceptTouchEvent(true);
+                    break;
+                }
+                return false;
+            }
+
+            @Override
+            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        };
+
+        recyclerView.addOnItemTouchListener(mScrollTouchListener);
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
@@ -65,15 +88,14 @@ public class LiquorSelect extends AppCompatActivity {
 
         // Define action on update button press
         updateButton.setOnClickListener(view -> {
-            ArrayList<String> liquorsInInventoryUpdated = new ArrayList<>();
-            for (String str : adapter.getSelectedLiquors()) {
-                if (liquorsOnlineAsList.contains(str)) {
-                    liquorsInInventoryUpdated.add(str);
-                }
-            }
-
             try {
-                InternalMemory.addToInventory(this, liquorsInInventoryUpdated);
+                ArrayList<String> temp2 = Inventory.getSelectedLiquors();
+                for (String str : temp2) {
+                    if (!liquorsList.contains(str)) {
+                        Inventory.removeSelectedLiquors(str);
+                    }
+                }
+                InternalMemory.addToInventory(this, Inventory.getSelectedLiquors());
             } catch (IOException e) {
                 e.printStackTrace();
             }

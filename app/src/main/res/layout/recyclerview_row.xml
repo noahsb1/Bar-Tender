@@ -2,12 +2,12 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
-              android:layout_height="46dp" tools:ignore="MissingDefaultResource" android:orientation="vertical">
+              android:layout_height="match_parent" tools:ignore="MissingDefaultResource" android:orientation="vertical">
 
     <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="0dp" android:layout_weight="1">
+            android:layout_height="26dp" android:layout_weight="1">
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -22,6 +22,7 @@
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/nestedRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="0dp" android:layout_weight="1"/>
+            android:layout_height="wrap_content" android:layout_weight="14"
+            android:nestedScrollingEnabled="true"/>
 
 </LinearLayout>

@@ -1,4 +1,4 @@
-package Utilities;
+package Utilities.RecycleViewAdapters;
 
 import Objects.RowType;
 import android.view.LayoutInflater;
@@ -25,9 +25,9 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     @Override
     public int getItemViewType(int position) {
         if (rowTypes.get(position) == 0) {
-            return RowType.categoryHeader;
+            return RowType.parentView;
         } else if (rowTypes.get(position) == 1) {
-            return RowType.checkBoxInCategory;
+            return RowType.normalTextBox;
         } else if (rowTypes.get(position) == 2) {
             return RowType.normalTextBox;
         } else {
@@ -87,14 +87,6 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         } else if (holder instanceof  MegaViewHolder) {
             MegaViewHolder megaViewHolder = (MegaViewHolder) holder;
             megaViewHolder.categoryHeader.setText(this.data.get(position));
-
-            RecyclerView recyclerView = megaViewHolder.subCategoryHolder;
-            LinearLayoutManager layoutManager = new LinearLayoutManager();
-            recyclerView.setLayoutManager(layoutManager);
-            adapter = new RecycleViewAdapter(liquorsInInventory, liquorsInInventory, temp);
-            recyclerView.setAdapter(adapter);
-            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                                                                                    layoutManager.getOrientation());
         }
     }
 
