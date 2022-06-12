@@ -1,6 +1,7 @@
 package Utilities.RecycleViewAdapters;
 
 import Objects.RowType;
+import Utilities.SetToArrayList;
 import android.content.Context;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -62,12 +63,7 @@ public class ParentRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.
             String category = hashMapKeys.get(position);
 
             HashMap<String, ArrayList<String>> subcategories = children.get(category);
-            Set<String> temp = subcategories.keySet();
-            Object[] subHashMapKeysArray = temp.toArray();
-            ArrayList<String> subHashMapKey = new ArrayList<>();
-            for (Object str : subHashMapKeysArray) {
-                subHashMapKey.add((String) str);
-            }
+            ArrayList<String> subHashMapKey = SetToArrayList.setToArrayList(subcategories.keySet());
             ArrayList<Integer> rowTypes = new ArrayList<>();
             for (int i = 0; i < subcategories.size(); i++) {
                 rowTypes.add(2);

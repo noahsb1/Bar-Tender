@@ -3,6 +3,7 @@ package Screens;
 import Utilities.InternalMemory;
 import Utilities.RecycleViewAdapters.ParentRecycleViewAdapter;
 import Utilities.RecycleViewAdapters.RecycleViewAdapter;
+import Utilities.SetToArrayList;
 import android.content.Intent;
 import android.view.MotionEvent;
 import android.widget.Button;
@@ -33,12 +34,8 @@ public class LiquorSelect extends AppCompatActivity {
         Button backButton = findViewById(R.id.backButton2);
         Button updateButton = findViewById(R.id.executeAddToInventory);
 
-        Set<String> temp = liquorsOnline.keySet();
-        Object[] hashMapKeysArray = temp.toArray();
-        ArrayList<String> hashMapKey = new ArrayList<>();
-        for (Object str : hashMapKeysArray) {
-            hashMapKey.add((String) str);
-        }
+        ArrayList<String> hashMapKey = SetToArrayList.setToArrayList(liquorsOnline.keySet());
+
         ArrayList<Integer> rowTypes = new ArrayList<>();
         for (int i = 0; i < liquorsOnline.size(); i++) {
             rowTypes.add(0);
