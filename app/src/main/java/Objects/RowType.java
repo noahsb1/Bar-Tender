@@ -1,7 +1,8 @@
 package Objects;
 
 public interface RowType {
-    int categoryHeader = 0;
-    int checkBoxInCategory = 1;
-    int normalTextBox = 2;
+    int parentView = 0;
+    int normalTextBox = 1;
+    int childView = 2;
+    int checkBox = 3;
 }
