@@ -1,9 +1,8 @@
-package Utilities.RecycleViewAdapters;
+package Utilities.Adapters;
 
 import Objects.RowType;
 import Screens.Inventory;
 import android.content.Context;
-import android.inputmethodservice.Keyboard;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

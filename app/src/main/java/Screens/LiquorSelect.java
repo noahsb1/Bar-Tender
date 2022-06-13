@@ -1,17 +1,13 @@
 package Screens;
 
+import Utilities.Adapters.ThreeLevelListAdapter;
 import Utilities.InternalMemory;
-import Utilities.RecycleViewAdapters.ParentRecycleViewAdapter;
-import Utilities.RecycleViewAdapters.RecycleViewAdapter;
 import Utilities.SetToArrayList;
 import android.content.Intent;
-import android.view.MotionEvent;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.io.IOException;
@@ -19,7 +15,10 @@ import java.util.*;
 
 public class LiquorSelect extends AppCompatActivity {
     private HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline;
-    private ParentRecycleViewAdapter   adapter;
+    private ArrayList<HashMap<String, ArrayList<String>>> data = new ArrayList<>();
+    private ArrayList<String> categories = new ArrayList<>();
+    private ArrayList<ArrayList<String>> secondLevel = new ArrayList<>();
+    private ExpandableListView expandableListView;
     private ArrayList<String> liquorsList;
 
     @Override
@@ -31,50 +30,12 @@ public class LiquorSelect extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         liquorsOnline = (HashMap<String, HashMap<String, ArrayList<String>>>) extras.get("liquors");
         liquorsList = (ArrayList<String>) extras.get("list");
+        categories = SetToArrayList.setToArrayList(liquorsOnline.keySet());
         Button backButton = findViewById(R.id.backButton2);
         Button updateButton = findViewById(R.id.executeAddToInventory);
 
-        ArrayList<String> hashMapKey = SetToArrayList.setToArrayList(liquorsOnline.keySet());
 
-        ArrayList<Integer> rowTypes = new ArrayList<>();
-        for (int i = 0; i < liquorsOnline.size(); i++) {
-            rowTypes.add(0);
-        }
-
-        // Sort liquor list alphabetically and initialize recycler view
-        RecyclerView recyclerView = findViewById(R.id.liquorRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new ParentRecycleViewAdapter(liquorsOnline, rowTypes, hashMapKey, this);
-        recyclerView.setAdapter(adapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(), layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
-
-        RecyclerView.OnItemTouchListener mScrollTouchListener = new RecyclerView.OnItemTouchListener() {
-            @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                int action = e.getAction();
-                switch (action) {
-                case MotionEvent.ACTION_MOVE:
-                    rv.getParent().requestDisallowInterceptTouchEvent(true);
-                    break;
-                }
-                return false;
-            }
-
-            @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-            }
-
-            @Override
-            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-            }
-        };
-
-        recyclerView.addOnItemTouchListener(mScrollTouchListener);
+        setUpAdapter();
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
@@ -86,7 +47,8 @@ public class LiquorSelect extends AppCompatActivity {
         // Define action on update button press
         updateButton.setOnClickListener(view -> {
             try {
-                ArrayList<String> temp2 = Inventory.getSelectedLiquors();
+                ArrayList<String> temp2 = new ArrayList<>();
+                temp2.addAll(Inventory.getSelectedLiquors());
                 for (String str : temp2) {
                     if (!liquorsList.contains(str)) {
                         Inventory.removeSelectedLiquors(str);
@@ -97,5 +59,27 @@ public class LiquorSelect extends AppCompatActivity {
                 e.printStackTrace();
             }
         });
+    }
+
+    private void setUpAdapter() {
+        for (String str : categories) {
+            secondLevel.add(SetToArrayList.setToArrayList(liquorsOnline.get(str).keySet()));
+            data.add(liquorsOnline.get(str));
+        }
+
+        expandableListView = findViewById(R.id.expandable_listview);
+        ThreeLevelListAdapter threeLevelListAdapter = new ThreeLevelListAdapter(this, categories, secondLevel, data);
+        expandableListView.setAdapter(threeLevelListAdapter);
+        expandableListView.setOnGroupExpandListener(
+            new ExpandableListView.OnGroupExpandListener() {
+                int previousGroup = -1;
+                @Override
+                public void onGroupExpand(int i) {
+                    if (i != previousGroup) {
+                        expandableListView.collapseGroup(previousGroup);
+                    }
+                    previousGroup = i;
+                }
+            });
     }
 }
