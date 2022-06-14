@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.core.content.ContextCompat;
 import com.example.bartender.R;
 
 import java.util.ArrayList;
@@ -70,6 +72,14 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         TextView text = view.findViewById(R.id.rowParentText);
         text.setText(this.categories.get(i));
 
+        if(b) {
+            view.findViewById(R.id.ivGroupIndicator1).setBackground(
+                context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp));
+        } else {
+            view.findViewById(R.id.ivGroupIndicator1).setBackground(
+                context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp));
+        }
+
         return view;
     }
 
@@ -98,7 +108,6 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
                         secondLevelExpandableListView.collapseGroup(previousGroup);
                     }
                     previousGroup = i;
-
                 }
             });
 

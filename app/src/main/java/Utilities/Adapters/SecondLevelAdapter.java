@@ -68,6 +68,15 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
         view = inflater.inflate(R.layout.expandableviewrow_second, null);
         TextView textView = view.findViewById(R.id.rowSecondText);
         textView.setText(getGroup(i).toString());
+
+        if(b) {
+            view.findViewById(R.id.ivGroupIndicator2).setBackground(
+                context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp));
+        } else {
+            view.findViewById(R.id.ivGroupIndicator2).setBackground(
+                context.getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp));
+        }
+
         return view;
     }
 
