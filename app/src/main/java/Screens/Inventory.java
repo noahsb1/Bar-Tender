@@ -119,13 +119,11 @@ public class Inventory extends AppCompatActivity {
                 String[] temp1 = category.split("\\{");
                 String categoryName = temp1[0];
                 String[] subCategories = temp1[1].substring(0, temp1[1].length() - 1).split("~~~");
-                Arrays.sort(subCategories);
                 HashMap<String, ArrayList<String>> subCategoriesHashMap = new HashMap<>();
                 for (String subCategory : subCategories) {
                     String[] temp2 = subCategory.split(":");
                     String subCategoryName = temp2[0];
                     String[] liquorsInSubCategory = temp2[1].split(";");
-                    Arrays.sort(liquorsInSubCategory);
                     ArrayList<String> liquorsInSubCategoryArrayList = new ArrayList<>();
                     Collections.addAll(liquorsInSubCategoryArrayList, liquorsInSubCategory);
                     liquorList.addAll(liquorsInSubCategoryArrayList);
