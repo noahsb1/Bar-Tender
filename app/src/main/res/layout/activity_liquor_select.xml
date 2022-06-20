@@ -48,7 +48,7 @@
 
             <ExpandableListView
                     android:groupIndicator="@null"
-                    android:id="@+id/expandable_listview"
+                    android:id="@+id/expandable_listview2"
                     android:layout_height="match_parent"
                     android:layout_width="match_parent"/>
         </LinearLayout>

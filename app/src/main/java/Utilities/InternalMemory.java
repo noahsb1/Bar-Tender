@@ -15,10 +15,8 @@ public class InternalMemory {
      * @return string of stored inventory
      * @throws IOException
      */
-    public static String getStoredInventory(Activity activity) throws IOException {
-        String file_name = "inventory.txt";
-
-        FileInputStream fileObj = activity.openFileInput(file_name);
+    public static String getStoredInventory(Activity activity, String filename) throws IOException {
+        FileInputStream fileObj = activity.openFileInput(filename);
         int read = -1;
         StringBuilder buffer = new StringBuilder();
         while((read = fileObj.read()) != -1) {
@@ -35,15 +33,11 @@ public class InternalMemory {
      * @param string
      * @throws IOException
      */
-    public static void addToInventory(Activity activity, ArrayList<String> string)
+    public static void addToInventory(Activity activity, String string, String filename)
         throws IOException {
-        String file_name = "inventory.txt";
 
-        FileOutputStream fileObj = activity.openFileOutput(file_name, Context.MODE_PRIVATE);
-        for (String str : string) {
-            fileObj.write((str + "!").getBytes());
-        }
-
+        FileOutputStream fileObj = activity.openFileOutput(filename, Context.MODE_PRIVATE);
+        fileObj.write(string.getBytes());
         fileObj.close();
     }
 }

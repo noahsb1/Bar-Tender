@@ -1,6 +1,7 @@
 package Screens;
 
 import Utilities.Adapters.ThreeLevelListAdapter;
+import Utilities.HashMapToString;
 import Utilities.InternalMemory;
 import Utilities.SetToArrayList;
 import android.content.Intent;
@@ -54,7 +55,10 @@ public class LiquorSelect extends AppCompatActivity {
                         Inventory.removeSelectedLiquors(str);
                     }
                 }
-                InternalMemory.addToInventory(this, Inventory.getSelectedLiquors());
+
+                String strFromHashMap = HashMapToString.hashMapToString(Inventory.getLiquorsInInventory());
+
+                InternalMemory.addToInventory(this, strFromHashMap, "LiquorsInInventory.txt");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -67,8 +71,8 @@ public class LiquorSelect extends AppCompatActivity {
             data.add(liquorsOnline.get(str));
         }
 
-        expandableListView = findViewById(R.id.expandable_listview);
-        ThreeLevelListAdapter threeLevelListAdapter = new ThreeLevelListAdapter(this, categories, secondLevel, data);
+        expandableListView = findViewById(R.id.expandable_listview2);
+        ThreeLevelListAdapter threeLevelListAdapter = new ThreeLevelListAdapter(this, categories, secondLevel, data, 1);
         expandableListView.setAdapter(threeLevelListAdapter);
         expandableListView.setOnGroupExpandListener(
             new ExpandableListView.OnGroupExpandListener() {

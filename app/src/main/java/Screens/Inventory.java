@@ -1,48 +1,69 @@
 package Screens;
 
 import Objects.MixedDrink;
+import Utilities.Adapters.ThreeLevelListAdapter;
 import Utilities.GitAccess;
 import Utilities.InternalMemory;
-import Utilities.Adapters.BaseRecycleViewAdapter;
+import Utilities.SetToArrayList;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.io.IOException;
 import java.util.*;
 
 public class Inventory extends AppCompatActivity {
-    private ArrayList<MixedDrink> drinkObjects;
-    private HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline;
-    private ArrayList<String> liquorsInInventory;
-    private static ArrayList<String> selectedLiquors;
-    private BaseRecycleViewAdapter adapter;
-    private ArrayList<String> liquorList;
+    private ArrayList<MixedDrink> drinkObjects = new ArrayList<>();
+    private HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline = new HashMap<>();
+    private ArrayList<String> liquorOnlineAsList = new ArrayList<>();
+    private static HashMap<String, HashMap<String, ArrayList<String>>> liquorsInInventory = new HashMap<>();
+    private ArrayList<String> liquorsInInventoryAsList = new ArrayList<>();
+    private static ArrayList<String> selectedLiquors = new ArrayList<>();
+
+    private ArrayList<HashMap<String, ArrayList<String>>> data = new ArrayList<>();
+    private ArrayList<String> categories = new ArrayList<>();
+    private ArrayList<ArrayList<String>> secondLevel = new ArrayList<>();
+    private ExpandableListView expandableListView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory);
 
-        // Initialize variables and copy inventory from memory
-        drinkObjects = new ArrayList<>();
-        liquorsOnline = new HashMap<>();
-        liquorsInInventory = new ArrayList<>();
-        selectedLiquors = new ArrayList<>();
-        liquorList = new ArrayList<>();
+        // Copy inventory from memory and turn into hashmap
         try {
-            String[] temp = InternalMemory.getStoredInventory(this).split("!");
-            liquorsInInventory.addAll(Arrays.asList(temp));
+            String temp = InternalMemory.getStoredInventory(this, "LiquorsInInventory.txt");
+            if(!temp.equals("")) {
+                String[] temp1 = temp.split("!");
+                for (String category : temp1) {
+                    String[] temp2 = category.split("\\{");
+                    String categoryName = temp2[0];
+                    String[] subCategories =
+                        temp2[1].substring(0, temp2[1].length() - 1).split("~~~");
+                    HashMap<String, ArrayList<String>> subCategoriesHashMap = new HashMap<>();
+                    for (String subCategory : subCategories) {
+                        String[] temp3 = subCategory.split(":");
+                        String subCategoryName = temp3[0];
+                        String[] liquorsInSubCategory = temp3[1].split(";");
+                        ArrayList<String> liquorsInSubCategoryArrayList = new ArrayList<>();
+                        Collections.addAll(liquorsInSubCategoryArrayList, liquorsInSubCategory);
+                        liquorsInInventoryAsList.addAll(liquorsInSubCategoryArrayList);
+                        subCategoriesHashMap.put(subCategoryName, liquorsInSubCategoryArrayList);
+                    }
+                    liquorsInInventory.put(categoryName, subCategoriesHashMap);
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        selectedLiquors.addAll(liquorsInInventory);
+        if (liquorsInInventoryAsList != null) {
+            selectedLiquors.addAll(liquorsInInventoryAsList);
+        }
         Button backButton = findViewById(R.id.backButton);
         Button mixedDrinkFinder = findViewById(R.id.mixedDrinkFinder);
         Button addToInventory = findViewById(R.id.addToInventory);
@@ -51,22 +72,9 @@ public class Inventory extends AppCompatActivity {
         gitCall gitCall = new gitCall();
         gitCall.execute();
 
-        // Creates viewTypes array for Recycler Table
-        ArrayList<Integer> temp = new ArrayList<>();
-        for (int i = 0; i < liquorsInInventory.size(); i++) {
-            temp.add(1);
-        }
-
-        // Sort liquor list alphabetically and initialize recycler view
-        Collections.sort(this.liquorsInInventory);
-        RecyclerView recyclerView = findViewById(R.id.inventoryRecyclerView);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new BaseRecycleViewAdapter(liquorsInInventory, temp, this);
-        recyclerView.setAdapter(adapter);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                                                                                layoutManager.getOrientation());
-        recyclerView.addItemDecoration(dividerItemDecoration);
+        // Set up inventory adapter
+        categories = SetToArrayList.setToArrayList(liquorsInInventory.keySet());
+        setUpAdapter();
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
@@ -80,7 +88,7 @@ public class Inventory extends AppCompatActivity {
             Intent intent = new Intent(Inventory.this, LiquorSelect.class);
             gitCall.cancel(true);
             intent.putExtra("liquors", liquorsOnline);
-            intent.putExtra("list", liquorList);
+            intent.putExtra("list", liquorOnlineAsList);
             startActivity(intent);
             this.finish();
         });
@@ -126,7 +134,7 @@ public class Inventory extends AppCompatActivity {
                     String[] liquorsInSubCategory = temp2[1].split(";");
                     ArrayList<String> liquorsInSubCategoryArrayList = new ArrayList<>();
                     Collections.addAll(liquorsInSubCategoryArrayList, liquorsInSubCategory);
-                    liquorList.addAll(liquorsInSubCategoryArrayList);
+                    liquorOnlineAsList.addAll(liquorsInSubCategoryArrayList);
                     subCategoriesHashMap.put(subCategoryName, liquorsInSubCategoryArrayList);
                 }
                 liquorsOnline.put(categoryName, subCategoriesHashMap);
@@ -144,5 +152,32 @@ public class Inventory extends AppCompatActivity {
 
     public static void removeSelectedLiquors(String str) {
         selectedLiquors.remove(str);
+    }
+
+    public static HashMap<String, HashMap<String, ArrayList<String>>> getLiquorsInInventory() {
+        return liquorsInInventory;
+    }
+
+    private void setUpAdapter() {
+        for (String str : categories) {
+            secondLevel.add(SetToArrayList.setToArrayList(liquorsInInventory.get(str).keySet()));
+            data.add(liquorsInInventory.get(str));
+        }
+
+        expandableListView = findViewById(R.id.expandable_listview1);
+        ThreeLevelListAdapter
+            threeLevelListAdapter = new ThreeLevelListAdapter(this, categories, secondLevel, data, 2);
+        expandableListView.setAdapter(threeLevelListAdapter);
+        expandableListView.setOnGroupExpandListener(
+            new ExpandableListView.OnGroupExpandListener() {
+                int previousGroup = -1;
+                @Override
+                public void onGroupExpand(int i) {
+                    if (i != previousGroup) {
+                        expandableListView.collapseGroup(previousGroup);
+                    }
+                    previousGroup = i;
+                }
+            });
     }
 }

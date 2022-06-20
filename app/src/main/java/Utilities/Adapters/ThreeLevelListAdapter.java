@@ -1,5 +1,6 @@
 package Utilities.Adapters;
 
+import Utilities.SetToArrayList;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,22 +13,27 @@ import androidx.core.content.ContextCompat;
 import com.example.bartender.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
     private Context context;
     private ArrayList<String> categories;
     private ArrayList<ArrayList<String>> subCategories;
     private ArrayList<HashMap<String, ArrayList<String>>> data;
+    private int select;
 
     public ThreeLevelListAdapter (Context context,
                                   ArrayList<String> categories,
                                   ArrayList<ArrayList<String>> subCategories,
-                                  ArrayList<HashMap<String, ArrayList<String>>> data) {
+                                  ArrayList<HashMap<String, ArrayList<String>>> data,
+                                  int select) {
         this.context = context;
         this.categories = categories;
         this.subCategories = subCategories;
         this.data = data;
+        this.select = select;
     }
 
     @Override
@@ -88,15 +94,19 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         final SecondLevelExpandableListView secondLevelExpandableListView = new SecondLevelExpandableListView(context);
 
         ArrayList<String> subCategoryList = subCategories.get(i);
+        Collections.sort(subCategoryList);
 
         ArrayList<ArrayList<String>> childData = new ArrayList<>();
         HashMap<String, ArrayList<String>> secondLevelData = data.get(i);
+        ArrayList<String> temp1 = SetToArrayList.setToArrayList(secondLevelData.keySet());
+        Collections.sort(temp1);
 
-        for(String str : secondLevelData.keySet()) {
+        for(String str : temp1) {
             childData.add(secondLevelData.get(str));
         }
 
-        secondLevelExpandableListView.setAdapter(new SecondLevelAdapter(context, childData, subCategoryList));
+        secondLevelExpandableListView.setAdapter(new SecondLevelAdapter(context, childData, subCategoryList,
+                                                                        categories.get(i), select));
         secondLevelExpandableListView.setGroupIndicator(null);
 
         secondLevelExpandableListView.setOnGroupExpandListener(
