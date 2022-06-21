@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.util.ArrayList;
@@ -14,13 +16,13 @@ import java.util.HashMap;
 
 public class SecondLevelAdapter extends BaseExpandableListAdapter {
     private Context context;
-    private ArrayList<ArrayList<String>> data;
+    private ArrayList<ArrayList> data;
     private ArrayList<String> subCategories;
     private String grandParent;
     private int select;
 
     public SecondLevelAdapter (Context context,
-                               ArrayList<ArrayList<String>> data,
+                               ArrayList<ArrayList> data,
                                ArrayList<String> subCategories,
                                String grandParent,
                                int select) {
@@ -75,6 +77,9 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
         view = inflater.inflate(R.layout.expandableviewrow_second, null);
         TextView textView = view.findViewById(R.id.rowSecondText);
         textView.setText(getGroup(i).toString());
+        if (select == 3) {
+            view.findViewById(R.id.rowSecondText).setPadding(0,0,0,0);
+        }
 
         if(b) {
             view.findViewById(R.id.ivGroupIndicator2).setBackground(
@@ -90,9 +95,12 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
     @Override
     public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        ArrayList<String> childArray = data.get(i);
-        Collections.sort(childArray);
-        String txt = childArray.get(i1);
+        String txt = "";
+        if (select != 3) {
+            ArrayList<String> childArray = data.get(i);
+            Collections.sort(childArray);
+            txt = childArray.get(i1);
+        }
 
         if (select == 1) {
             view = inflater.inflate(R.layout.expandableviewrow_thirdcheck, null);
@@ -152,6 +160,19 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
             view = inflater.inflate(R.layout.expandableviewrow_thirdtext, null);
             TextView textView = view.findViewById(R.id.rowThirdTextBox);
             textView.setText(txt);
+        } else  if (select == 3) {
+            view = inflater.inflate(R.layout.expandableviewrow_recyclerview, null);
+            RecyclerView recyclerView = view.findViewById(R.id.recyclerViewNested);
+            RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(context, 2);
+            recyclerView.setLayoutManager(mLayoutManager);
+
+            ArrayList<Integer> rowTypes = new ArrayList<>();
+            for (int j = 0; j < ((ArrayList)data.get(i).get(0)).size(); j++) {
+                rowTypes.add(2);
+            }
+
+            BaseRecycleViewAdapter adapter = new BaseRecycleViewAdapter((ArrayList) data.get(i).get(0), rowTypes, context);
+            recyclerView.setAdapter(adapter);
         }
         return view;
     }

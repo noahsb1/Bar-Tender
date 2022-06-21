@@ -2,9 +2,11 @@ package Screens;
 
 import Objects.MixedDrink;
 import Utilities.Adapters.BaseRecycleViewAdapter;
+import Utilities.Adapters.SecondLevelAdapter;
 import Utilities.ErrorDisplay;
 import android.content.Intent;
 import android.widget.Button;
+import android.widget.ExpandableListView;
 import android.widget.SearchView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 public class DrinkSelect extends AppCompatActivity {
     public BaseRecycleViewAdapter adapter;
     public ArrayList<MixedDrink> mixedDrinks;
+    private ExpandableListView expandableListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,11 +50,7 @@ public class DrinkSelect extends AppCompatActivity {
             }
         });
 
-        RecyclerView recyclerView = findViewById(R.id.drinkSelectRecyclerView);
-        RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(this, 2);
-        recyclerView.setLayoutManager(mLayoutManager);
-        adapter = new BaseRecycleViewAdapter(mixedDrinks, rowTypes, this);
-        recyclerView.setAdapter(adapter);
+        setUpAdapter();
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
@@ -76,5 +75,38 @@ public class DrinkSelect extends AppCompatActivity {
         } else {
             adapter.filterList(filteredlist, rowTypes);
         }
+    }
+
+    private void setUpAdapter() {
+        expandableListView = findViewById(R.id.expandable_listview3);
+
+        ArrayList<String> categories = new ArrayList<>();
+        categories.add("Drinks you can make");
+        categories.add("Drinks you can't make");
+
+        ArrayList<ArrayList> mixedDrinks =  new ArrayList<>();
+        mixedDrinks.add(0, new ArrayList<>());
+        mixedDrinks.get(0).add(new ArrayList<>());
+        mixedDrinks.add(1, new ArrayList<>());
+        mixedDrinks.get(1).add(new ArrayList<>());
+
+        for (MixedDrink drink : this.mixedDrinks) {
+            ((ArrayList) mixedDrinks.get(0).get(0)).add(drink);
+        }
+
+
+        SecondLevelAdapter secondLevelAdapter = new SecondLevelAdapter(this, mixedDrinks, categories, "", 3);
+        expandableListView.setAdapter(secondLevelAdapter);
+        expandableListView.setOnGroupExpandListener(
+            new ExpandableListView.OnGroupExpandListener() {
+                int previousGroup = -1;
+                @Override
+                public void onGroupExpand(int i) {
+                    if (i != previousGroup) {
+                        expandableListView.collapseGroup(previousGroup);
+                    }
+                    previousGroup = i;
+                }
+            });
     }
 }

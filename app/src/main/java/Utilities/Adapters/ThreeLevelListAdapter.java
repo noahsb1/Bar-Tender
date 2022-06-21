@@ -96,7 +96,7 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         ArrayList<String> subCategoryList = subCategories.get(i);
         Collections.sort(subCategoryList);
 
-        ArrayList<ArrayList<String>> childData = new ArrayList<>();
+        ArrayList<ArrayList> childData = new ArrayList<>();
         HashMap<String, ArrayList<String>> secondLevelData = data.get(i);
         ArrayList<String> temp1 = SetToArrayList.setToArrayList(secondLevelData.keySet());
         Collections.sort(temp1);
