@@ -1,5 +1,6 @@
 package Utilities.Adapters;
 
+import Objects.MixedDrink;
 import Objects.RowType;
 import Screens.Inventory;
 import android.content.Context;
@@ -7,24 +8,34 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.util.ArrayList;
 
 public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final ArrayList<String> children;
-    private final ArrayList<Integer> rowTypes;
+    private ArrayList children;
+    private ArrayList<Integer> rowTypes;
     public Context cxt;
 
-    public BaseRecycleViewAdapter (ArrayList<String> children,
+    public BaseRecycleViewAdapter (ArrayList children,
                                    ArrayList<Integer> rowTypes,
                                    Context cxt) {
         this.children = children;
         this.rowTypes = rowTypes;
         this.cxt = cxt;
+    }
+
+
+
+    public void filterList(ArrayList<MixedDrink> filterllist, ArrayList<Integer> rowTypes) {
+        children = filterllist;
+        this.rowTypes = rowTypes;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -33,7 +44,9 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             return RowType.normalTextBox;
         } else if(rowTypes.get(position) == 3) {
             return RowType.checkBox;
-        } else {
+        } else if (rowTypes.get(position) == 2) {
+            return RowType.cardView;
+        }else {
             return -1;
         }
     }
@@ -47,6 +60,9 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         } else if (viewType == 3) {
             View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_rowcheckbox, parent, false);
             return new CheckBoxViewHolder(rowItem);
+        } else if (viewType == 2) {
+            View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_cardview, parent, false);
+            return new CardViewHolder(rowItem);
         } else {
             return null;
         }
@@ -56,7 +72,7 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CheckBoxViewHolder) {
             CheckBoxViewHolder checkBoxHolder = (CheckBoxViewHolder) holder;
-            checkBoxHolder.checkBox.setText(this.children.get(position));
+            checkBoxHolder.checkBox.setText((String) this.children.get(position));
             if (Inventory.getSelectedLiquors().contains(checkBoxHolder.checkBox.getText().toString())) {
                 checkBoxHolder.checkBox.setSelected(true);
                 checkBoxHolder.checkBox.setChecked(true);
@@ -77,7 +93,14 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             });
         } else if (holder instanceof NormalTextBoxViewHolder) {
             NormalTextBoxViewHolder normalTextBoxHolder = (NormalTextBoxViewHolder) holder;
-            normalTextBoxHolder.textView.setText(this.children.get(position));
+            normalTextBoxHolder.textView.setText((String) this.children.get(position));
+        } else if (holder instanceof CardViewHolder) {
+            CardViewHolder cardViewHolder = (CardViewHolder) holder;
+            cardViewHolder.textView.setText(((ArrayList<MixedDrink>) children).get(position).getName());
+
+            cardViewHolder.setItemClickListener((v, pos) -> {
+
+            });
         }
     }
 
@@ -106,6 +129,35 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
 
         public void setItemClickListener(ItemClickListener ic) {
+            this.itemClickListener = ic;
+        }
+
+        @Override
+        public void onClick(View v) {
+            this.itemClickListener.onItemClick(v, getLayoutPosition());
+        }
+
+        public interface ItemClickListener {
+            void onItemClick(View v, int pos);
+        }
+    }
+
+    public static class CardViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private ImageView imageView;
+        private TextView textView;
+        public CardView cardView;
+        private CardViewHolder.ItemClickListener itemClickListener;
+
+
+        public CardViewHolder(View view) {
+            super(view);
+            this.imageView = view.findViewById(R.id.drinkImg);
+            this.textView = view.findViewById(R.id.drinkName);
+            this.cardView = view.findViewById(R.id.card_view);
+            this.cardView.setOnClickListener(this);
+        }
+
+        public void setItemClickListener(CardViewHolder.ItemClickListener ic) {
             this.itemClickListener = ic;
         }
 

@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Inventory extends AppCompatActivity {
-    private ArrayList<MixedDrink> drinkObjects = new ArrayList<>();
+    private ArrayList<MixedDrink> mixedDrinks = new ArrayList<>();
     private HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline = new HashMap<>();
     private ArrayList<String> liquorOnlineAsList = new ArrayList<>();
     private static HashMap<String, HashMap<String, ArrayList<String>>> liquorsInInventory = new HashMap<>();
@@ -92,6 +92,15 @@ public class Inventory extends AppCompatActivity {
             startActivity(intent);
             this.finish();
         });
+
+        // Define action on mixed drink button press
+        mixedDrinkFinder.setOnClickListener(view -> {
+            Intent intent = new Intent(Inventory.this, DrinkSelect.class);
+            gitCall.cancel(true);
+            intent.putExtra("mixedDrinks", mixedDrinks);
+            startActivity(intent);
+            this.finish();
+        });
     }
 
     /**
@@ -120,7 +129,7 @@ public class Inventory extends AppCompatActivity {
             String[] liquorArray = string.get(1);
             for (String drink : drinks) {
                 String[] temp2 = drink.split(";");
-                drinkObjects.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
+                mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
             }
 
             for (String category: liquorArray) {

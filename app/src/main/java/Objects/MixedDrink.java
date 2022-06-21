@@ -1,6 +1,6 @@
 package Objects;
 
-public class MixedDrink {
+public class MixedDrink implements java.io.Serializable {
     private final String name;
     private final String ingredients;
     private final String recipe;

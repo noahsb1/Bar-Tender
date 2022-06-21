@@ -32,7 +32,7 @@ public class LiquorSelect extends AppCompatActivity {
         liquorsOnline = (HashMap<String, HashMap<String, ArrayList<String>>>) extras.get("liquors");
         liquorsList = (ArrayList<String>) extras.get("list");
         categories = SetToArrayList.setToArrayList(liquorsOnline.keySet());
-        Button backButton = findViewById(R.id.backButton2);
+        Button backButton = findViewById(R.id.backButton3);
         Button updateButton = findViewById(R.id.executeAddToInventory);
 
 

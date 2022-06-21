@@ -18,6 +18,9 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.BarTender">
         <activity
+                android:name="Screens.DrinkSelect"
+                android:exported="true"/>
+        <activity
                 android:name="Screens.LiquorSelect"
                 android:exported="true"/>
         <activity
