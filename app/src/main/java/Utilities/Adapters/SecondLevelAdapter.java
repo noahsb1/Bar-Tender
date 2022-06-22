@@ -1,5 +1,6 @@
 package Utilities.Adapters;
 
+import Objects.MixedDrink;
 import Screens.Inventory;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -31,6 +32,11 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
         this.subCategories = subCategories;
         this.grandParent = grandParent;
         this.select = select;
+    }
+
+    public void filterList(ArrayList<ArrayList> filterllist) {
+        data = filterllist;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -79,6 +85,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
         textView.setText(getGroup(i).toString());
         if (select == 3) {
             view.findViewById(R.id.rowSecondText).setPadding(0,0,0,0);
+            textView.setText(getGroup(i).toString() + " (" + ((ArrayList) data.get(i).get(0)).size() + ")");
         }
 
         if(b) {
@@ -116,8 +123,8 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
                 checkBox.setChecked(false);
             }
 
-            checkBox.setOnCheckedChangeListener((compoundButton, b1) -> {
-                CheckBox myCheckBox = (CheckBox) compoundButton;
+            checkBox.setOnClickListener(view1 -> {
+                CheckBox myCheckBox = (CheckBox) view1;
                 myCheckBox.setOnCheckedChangeListener(null);
                 if (myCheckBox.isChecked()) {
                     Inventory.addToSelectedLiquors(myCheckBox.getText().toString());
@@ -156,6 +163,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
                     }
                 }
             });
+
         } else if (select == 2) {
             view = inflater.inflate(R.layout.expandableviewrow_thirdtext, null);
             TextView textView = view.findViewById(R.id.rowThirdTextBox);

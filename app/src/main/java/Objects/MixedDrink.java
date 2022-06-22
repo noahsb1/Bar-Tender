@@ -4,11 +4,23 @@ public class MixedDrink implements java.io.Serializable {
     private final String name;
     private final String ingredients;
     private final String recipe;
+    private final String categoriesOfIngredients;
+    private final byte[] image;
 
-    public MixedDrink(String name, String ingredients, String recipe) {
+    public MixedDrink(String name, String ingredients, String recipe, String categoriesOfIngredients, byte[] image) {
         this.name = name;
         this.ingredients = ingredients;
         this.recipe = recipe;
+        this.categoriesOfIngredients = categoriesOfIngredients;
+        this.image = image;
+    }
+
+    public String getCategoriesOfIngredients() {
+        return categoriesOfIngredients;
+    }
+
+    public byte[] getImage() {
+        return image;
     }
 
     public String getName() {

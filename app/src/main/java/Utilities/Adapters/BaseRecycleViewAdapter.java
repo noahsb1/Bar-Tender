@@ -3,7 +3,11 @@ package Utilities.Adapters;
 import Objects.MixedDrink;
 import Objects.RowType;
 import Screens.Inventory;
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,11 +36,7 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
 
 
-    public void filterList(ArrayList<MixedDrink> filterllist, ArrayList<Integer> rowTypes) {
-        children = filterllist;
-        this.rowTypes = rowTypes;
-        notifyDataSetChanged();
-    }
+
 
     @Override
     public int getItemViewType(int position) {
@@ -96,7 +96,17 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             normalTextBoxHolder.textView.setText((String) this.children.get(position));
         } else if (holder instanceof CardViewHolder) {
             CardViewHolder cardViewHolder = (CardViewHolder) holder;
-            cardViewHolder.textView.setText(((ArrayList<MixedDrink>) children).get(position).getName());
+            MixedDrink mixedDrink = ((ArrayList<MixedDrink>) children).get(position);
+            Bitmap bm = BitmapFactory.decodeByteArray(mixedDrink.getImage(), 0, (mixedDrink.getImage().length));
+
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            ((Activity)cxt).getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+            int screenHeight = displaymetrics.heightPixels;
+            int screenWidth = displaymetrics.widthPixels;
+
+            Bitmap bmresized = Bitmap.createScaledBitmap(bm, (int) (screenWidth*.5), (int) (screenHeight*.25), true);
+            cardViewHolder.textView.setText(mixedDrink.getName());
+            cardViewHolder.imageView.setImageBitmap(bmresized);
 
             cardViewHolder.setItemClickListener((v, pos) -> {
 

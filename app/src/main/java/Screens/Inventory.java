@@ -12,21 +12,23 @@ import android.widget.ExpandableListView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import com.example.bartender.R;
+import android.util.Base64;
 
 import java.io.IOException;
 import java.util.*;
 
 public class Inventory extends AppCompatActivity {
-    private ArrayList<MixedDrink> mixedDrinks = new ArrayList<>();
-    private HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline = new HashMap<>();
-    private ArrayList<String> liquorOnlineAsList = new ArrayList<>();
-    private static HashMap<String, HashMap<String, ArrayList<String>>> liquorsInInventory = new HashMap<>();
-    private ArrayList<String> liquorsInInventoryAsList = new ArrayList<>();
-    private static ArrayList<String> selectedLiquors = new ArrayList<>();
+    private final ArrayList<MixedDrink> mixedDrinks = new ArrayList<>();
+    private final HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline = new HashMap<>();
+    private final ArrayList<String> liquorOnlineAsList = new ArrayList<>();
+    private static final HashMap<String, HashMap<String, ArrayList<String>>> liquorsInInventory = new HashMap<>();
+    private final ArrayList<String> liquorsInInventoryAsList = new ArrayList<>();
+    private final ArrayList<String> subcategoriesOfLiquorsInInventoryAsList = new ArrayList<>();
+    private static final ArrayList<String> selectedLiquors = new ArrayList<>();
 
-    private ArrayList<HashMap<String, ArrayList<String>>> data = new ArrayList<>();
+    private final ArrayList<HashMap<String, ArrayList<String>>> data = new ArrayList<>();
     private ArrayList<String> categories = new ArrayList<>();
-    private ArrayList<ArrayList<String>> secondLevel = new ArrayList<>();
+    private final ArrayList<ArrayList<String>> secondLevel = new ArrayList<>();
     private ExpandableListView expandableListView;
 
 
@@ -36,34 +38,15 @@ public class Inventory extends AppCompatActivity {
         setContentView(R.layout.activity_inventory);
 
         // Copy inventory from memory and turn into hashmap
-        try {
-            String temp = InternalMemory.getStoredInventory(this, "LiquorsInInventory.txt");
-            if(!temp.equals("")) {
-                String[] temp1 = temp.split("!");
-                for (String category : temp1) {
-                    String[] temp2 = category.split("\\{");
-                    String categoryName = temp2[0];
-                    String[] subCategories =
-                        temp2[1].substring(0, temp2[1].length() - 1).split("~~~");
-                    HashMap<String, ArrayList<String>> subCategoriesHashMap = new HashMap<>();
-                    for (String subCategory : subCategories) {
-                        String[] temp3 = subCategory.split(":");
-                        String subCategoryName = temp3[0];
-                        String[] liquorsInSubCategory = temp3[1].split(";");
-                        ArrayList<String> liquorsInSubCategoryArrayList = new ArrayList<>();
-                        Collections.addAll(liquorsInSubCategoryArrayList, liquorsInSubCategory);
-                        liquorsInInventoryAsList.addAll(liquorsInSubCategoryArrayList);
-                        subCategoriesHashMap.put(subCategoryName, liquorsInSubCategoryArrayList);
-                    }
-                    liquorsInInventory.put(categoryName, subCategoriesHashMap);
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        loadFromMemory();
+
+        // Add liquors in inventory to selected liquors
         if (liquorsInInventoryAsList != null) {
+            selectedLiquors.clear();
             selectedLiquors.addAll(liquorsInInventoryAsList);
         }
+
+        // Define buttons
         Button backButton = findViewById(R.id.backButton);
         Button mixedDrinkFinder = findViewById(R.id.mixedDrinkFinder);
         Button addToInventory = findViewById(R.id.addToInventory);
@@ -98,6 +81,8 @@ public class Inventory extends AppCompatActivity {
             Intent intent = new Intent(Inventory.this, DrinkSelect.class);
             gitCall.cancel(true);
             intent.putExtra("mixedDrinks", mixedDrinks);
+            intent.putExtra("inventoryList", liquorsInInventoryAsList);
+            intent.putExtra("categoryList", subcategoriesOfLiquorsInInventoryAsList);
             startActivity(intent);
             this.finish();
         });
@@ -127,11 +112,14 @@ public class Inventory extends AppCompatActivity {
         protected void onPostExecute(ArrayList<String[]> string) {
             String[] drinks = string.get(0);
             String[] liquorArray = string.get(1);
+
+            // Turn drink strings into mixed drink objects
             for (String drink : drinks) {
                 String[] temp2 = drink.split(";");
-                mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2]));
+                mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3], Base64.decode(temp2[4], Base64.DEFAULT)));
             }
 
+            // Turn liquor string into hashmap of categoreis and subcategories
             for (String category: liquorArray) {
                 String[] temp1 = category.split("\\{");
                 String categoryName = temp1[0];
@@ -156,7 +144,9 @@ public class Inventory extends AppCompatActivity {
     }
 
     public static void addToSelectedLiquors(String str) {
-        selectedLiquors.add(str);
+        if (!selectedLiquors.contains(str)) {
+            selectedLiquors.add(str);
+        }
     }
 
     public static void removeSelectedLiquors(String str) {
@@ -188,5 +178,34 @@ public class Inventory extends AppCompatActivity {
                     previousGroup = i;
                 }
             });
+    }
+
+    private void loadFromMemory() {
+        try {
+            String temp = InternalMemory.getStoredInventory(this, "LiquorsInInventory.txt");
+            if(!temp.equals("")) {
+                String[] temp1 = temp.split("!");
+                for (String category : temp1) {
+                    String[] temp2 = category.split("\\{");
+                    String categoryName = temp2[0];
+                    String[] subCategories =
+                        temp2[1].substring(0, temp2[1].length() - 1).split("~~~");
+                    HashMap<String, ArrayList<String>> subCategoriesHashMap = new HashMap<>();
+                    for (String subCategory : subCategories) {
+                        String[] temp3 = subCategory.split(":");
+                        String subCategoryName = temp3[0];
+                        subcategoriesOfLiquorsInInventoryAsList.add(subCategoryName.toLowerCase());
+                        String[] liquorsInSubCategory = temp3[1].split(";");
+                        ArrayList<String> liquorsInSubCategoryArrayList = new ArrayList<>();
+                        Collections.addAll(liquorsInSubCategoryArrayList, liquorsInSubCategory);
+                        liquorsInInventoryAsList.addAll(liquorsInSubCategoryArrayList);
+                        subCategoriesHashMap.put(subCategoryName, liquorsInSubCategoryArrayList);
+                    }
+                    liquorsInInventory.put(categoryName, subCategoriesHashMap);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
