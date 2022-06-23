@@ -116,7 +116,12 @@ public class Inventory extends AppCompatActivity {
             // Turn drink strings into mixed drink objects
             for (String drink : drinks) {
                 String[] temp2 = drink.split(";");
-                mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3], Base64.decode(temp2[4], Base64.DEFAULT)));
+                if (temp2.length == 5) {
+                    mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3],
+                                                   Base64.decode(temp2[4], Base64.DEFAULT)));
+                } else {
+                    mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3], null));
+                }
             }
 
             // Turn liquor string into hashmap of categoreis and subcategories

@@ -2,17 +2,20 @@ package Utilities.Adapters;
 
 import Objects.MixedDrink;
 import Objects.RowType;
+import Screens.DrinkSelect;
 import Screens.Inventory;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -20,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.util.ArrayList;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private ArrayList children;
@@ -33,10 +38,6 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         this.rowTypes = rowTypes;
         this.cxt = cxt;
     }
-
-
-
-
 
     @Override
     public int getItemViewType(int position) {
@@ -109,7 +110,24 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             cardViewHolder.imageView.setImageBitmap(bmresized);
 
             cardViewHolder.setItemClickListener((v, pos) -> {
+                LayoutInflater inflater = (LayoutInflater)
+                    ((Activity)cxt).getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.drink_popup, null);
+                TextView popupName = (TextView) popupView.findViewById(R.id.drinkNamePopup);
+                ImageView popupImage = (ImageView) popupView.findViewById(R.id.drinkImagePopUp);
+                TextView ingredientsList = (TextView) popupView.findViewById(R.id.ingredientsList);
+                TextView recipe = (TextView) popupView.findViewById(R.id.recipe);
 
+                popupName.setText(mixedDrink.getName());
+                popupImage.setImageBitmap(bmresized);
+                ingredientsList.setText(mixedDrink.getIngredients().replaceAll("~~~", "\n"));
+                recipe.setText(mixedDrink.getRecipe().replaceAll("~~~", "\n"));
+
+                int width = (int) (screenWidth*.5);
+                int height = (int) (screenHeight*.75);
+                boolean focusable = true; // lets taps outside the popup also dismiss it
+                final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+                popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
             });
         }
     }
