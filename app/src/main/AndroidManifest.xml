@@ -17,18 +17,13 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/Theme.BarTender">
-        <activity
-                android:name="Screens.DrinkSelect"
-                android:exported="true"/>
+
         <activity
                 android:name="Screens.LiquorSelect"
                 android:exported="true"/>
         <activity
-                android:name="Screens.Inventory"
-                android:exported="true"/>
-        <activity
-                android:name="Screens.MainActivity"
-                android:exported="true">
+                android:name="Screens.Combined"
+                android:exported="true" android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

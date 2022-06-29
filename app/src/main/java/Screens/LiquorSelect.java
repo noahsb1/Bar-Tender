@@ -1,5 +1,6 @@
 package Screens;
 
+import Fragments.Inventory;
 import Utilities.Adapters.ThreeLevelListAdapter;
 import Utilities.HashMapToString;
 import Utilities.InternalMemory;
@@ -40,7 +41,7 @@ public class LiquorSelect extends AppCompatActivity {
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
-            Intent intent = new Intent(LiquorSelect.this, Inventory.class);
+            Intent intent = new Intent(LiquorSelect.this, Combined.class);
             startActivity(intent);
             this.finish();
         });

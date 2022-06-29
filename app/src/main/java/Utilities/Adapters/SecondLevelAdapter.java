@@ -1,7 +1,6 @@
 package Utilities.Adapters;
 
-import Objects.MixedDrink;
-import Screens.Inventory;
+import Fragments.Inventory;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;

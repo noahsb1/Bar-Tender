@@ -1,6 +1,8 @@
-package Screens;
+package Fragments;
 
 import Objects.MixedDrink;
+import Screens.Combined;
+import Screens.LiquorSelect;
 import Utilities.Adapters.ThreeLevelListAdapter;
 import Utilities.GitAccess;
 import Utilities.InternalMemory;
@@ -12,24 +14,30 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.util.Base64;
 import android.widget.Button;
 import android.widget.ExpandableListView;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import com.example.bartender.R;
-import android.util.Base64;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
-public class Inventory extends AppCompatActivity {
-    private final ArrayList<MixedDrink> mixedDrinks = new ArrayList<>();
+public class Inventory extends Fragment {
+    private static final ArrayList<MixedDrink> mixedDrinks = new ArrayList<>();
     private final HashMap<String, HashMap<String, ArrayList<String>>> liquorsOnline = new HashMap<>();
     private final ArrayList<String> liquorOnlineAsList = new ArrayList<>();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> liquorsInInventory = new HashMap<>();
-    private final ArrayList<String> liquorsInInventoryAsList = new ArrayList<>();
-    private final ArrayList<String> subcategoriesOfLiquorsInInventoryAsList = new ArrayList<>();
+    private static final ArrayList<String> liquorsInInventoryAsList = new ArrayList<>();
+    private static final ArrayList<String> subcategoriesOfLiquorsInInventoryAsList = new ArrayList<>();
     private static final ArrayList<String> selectedLiquors = new ArrayList<>();
 
     private final ArrayList<HashMap<String, ArrayList<String>>> data = new ArrayList<>();
@@ -37,11 +45,25 @@ public class Inventory extends AppCompatActivity {
     private final ArrayList<ArrayList<String>> secondLevel = new ArrayList<>();
     private ExpandableListView expandableListView;
 
+    public Inventory() {
+        // Required empty public constructor
+    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_inventory);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_inventory, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        mixedDrinks.clear();
+        liquorsInInventory.clear();
+        liquorsInInventoryAsList.clear();
+        subcategoriesOfLiquorsInInventoryAsList.clear();
+        liquorsOnline.clear();
+        liquorOnlineAsList.clear();
 
         // Copy inventory from memory and turn into hashmap
         loadFromMemory();
@@ -53,9 +75,7 @@ public class Inventory extends AppCompatActivity {
         }
 
         // Define buttons
-        Button backButton = findViewById(R.id.backButton);
-        Button mixedDrinkFinder = findViewById(R.id.mixedDrinkFinder);
-        Button addToInventory = findViewById(R.id.addToInventory);
+        Button addToInventory = view.findViewById(R.id.addToInventory);
 
         // Execute AsyncTask to access internet
         gitCall gitCall = new gitCall();
@@ -65,33 +85,14 @@ public class Inventory extends AppCompatActivity {
         categories = SetToArrayList.setToArrayList(liquorsInInventory.keySet());
         setUpAdapter();
 
-        // Define action on back button press
-        backButton.setOnClickListener(view -> {
-            Intent intent = new Intent(Inventory.this, MainActivity.class);
-            startActivity(intent);
-            this.finish();
-        });
-
         // Define action on add to inventory button press
-        addToInventory.setOnClickListener(view -> {
-            Intent intent = new Intent(Inventory.this, LiquorSelect.class);
+        addToInventory.setOnClickListener(view2 -> {
+            Intent intent = new Intent(getActivity(), LiquorSelect.class);
             gitCall.cancel(true);
             intent.putExtra("liquors", liquorsOnline);
             intent.putExtra("list", liquorOnlineAsList);
             startActivity(intent);
-            this.finish();
-        });
-
-        // Define action on mixed drink button press
-        mixedDrinkFinder.setOnClickListener(view -> {
-            Intent intent = new Intent(Inventory.this, DrinkSelect.class);
-            gitCall.cancel(true);
-            intent.putExtra("mixedDrinks", mixedDrinks);
-            intent.putExtra("inventoryList", liquorsInInventoryAsList);
-            intent.putExtra("categoryList", subcategoriesOfLiquorsInInventoryAsList);
-            intent.putExtra("categories", categories);
-            startActivity(intent);
-            this.finish();
+            getActivity().finish();
         });
     }
 
@@ -183,9 +184,9 @@ public class Inventory extends AppCompatActivity {
             data.add(liquorsInInventory.get(str));
         }
 
-        expandableListView = findViewById(R.id.expandable_listview1);
+        expandableListView = getView().findViewById(R.id.expandable_listview1);
         ThreeLevelListAdapter
-            threeLevelListAdapter = new ThreeLevelListAdapter(this, categories, secondLevel, data, 2);
+            threeLevelListAdapter = new ThreeLevelListAdapter(getContext(), categories, secondLevel, data, 2);
         expandableListView.setAdapter(threeLevelListAdapter);
         expandableListView.setOnGroupExpandListener(
             new ExpandableListView.OnGroupExpandListener() {
@@ -202,7 +203,7 @@ public class Inventory extends AppCompatActivity {
 
     private void loadFromMemory() {
         try {
-            String temp = InternalMemory.getStoredInventory(this, "LiquorsInInventory.txt");
+            String temp = InternalMemory.getStoredInventory(getActivity(), "LiquorsInInventory.txt");
             if(!temp.equals("")) {
                 String[] temp1 = temp.split("!");
                 for (String category : temp1) {
@@ -227,5 +228,17 @@ public class Inventory extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static ArrayList<MixedDrink> getMixedDrinks() {
+        return mixedDrinks;
+    }
+
+    public static ArrayList<String> getLiquorsInInventoryAsList() {
+        return liquorsInInventoryAsList;
+    }
+
+    public static ArrayList<String> getSubcategoriesOfLiquorsInInventoryAsList() {
+        return subcategoriesOfLiquorsInInventoryAsList;
     }
 }

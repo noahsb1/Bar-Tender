@@ -1,49 +1,48 @@
-package Screens;
+package Fragments;
 
 import Objects.MixedDrink;
 import Utilities.Adapters.BaseRecycleViewAdapter;
 import Utilities.Adapters.SecondLevelAdapter;
-import Utilities.ErrorDisplay;
-import android.content.Intent;
-import android.widget.Button;
+import android.os.Bundle;
 import android.widget.ExpandableListView;
 import android.widget.SearchView;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
-import javax.crypto.AEADBadTagException;
 import java.util.ArrayList;
 
-public class DrinkSelect extends AppCompatActivity {
+
+public class DrinkMenu extends Fragment {
     private ArrayList<MixedDrink> mixedDrinks;
     private ArrayList<String> liquorsInInventoryAsList;
     private ArrayList<String> subcategoriesOfLiquorsInInventoryAsList;
-    private ArrayList<String> categories;
     private ExpandableListView expandableListView;
     private SecondLevelAdapter secondLevelAdapter;
 
+    public DrinkMenu() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_drink_select);
-        Bundle extras = getIntent().getExtras();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_drink_menu, container, false);
+    }
 
-        Button backButton = findViewById(R.id.backButton3);
-        SearchView searchView = findViewById(R.id.searchBar);
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        SearchView searchView = view.findViewById(R.id.searchBar);
 
-
-        mixedDrinks = (ArrayList<MixedDrink>) extras.get("mixedDrinks");
-        liquorsInInventoryAsList = (ArrayList<String>) extras.get("inventoryList");
-        subcategoriesOfLiquorsInInventoryAsList = (ArrayList<String>) extras.get("categoryList");
-        categories = (ArrayList<String>) extras.get("categories");
-        ArrayList<Integer> rowTypes = new ArrayList<>();
-        for (int i = 0; i < mixedDrinks.size(); i++) {
-            rowTypes.add(i, 2);
-        }
+        mixedDrinks = Inventory.getMixedDrinks();
+        liquorsInInventoryAsList = Inventory.getLiquorsInInventoryAsList();
+        subcategoriesOfLiquorsInInventoryAsList = Inventory.getSubcategoriesOfLiquorsInInventoryAsList();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -61,29 +60,21 @@ public class DrinkSelect extends AppCompatActivity {
         setUpAdapter();
         setUpRecycler();
 
-        // Define action on back button press
-        backButton.setOnClickListener(view -> {
-            Intent intent = new Intent(DrinkSelect.this, Inventory.class);
-            startActivity(intent);
-            this.finish();
-        });
     }
 
     private void filter(String text) {
         ArrayList<MixedDrink> filteredlist = new ArrayList<>();
-        ArrayList<Integer> rowTypes = new ArrayList<>();
 
         for (MixedDrink item : mixedDrinks) {
             if (item.getName().toLowerCase().contains(text.toLowerCase())) {
                 filteredlist.add(item);
-                rowTypes.add(2);
             }
         }
         secondLevelAdapter.filterList(sortDrinks(filteredlist));
     }
 
     private void setUpAdapter() {
-        expandableListView = findViewById(R.id.expandable_listview3);
+        expandableListView = getView().findViewById(R.id.expandable_listview3);
 
         ArrayList<String> categories = new ArrayList<>();
         categories.add("Drinks you can make");
@@ -92,7 +83,7 @@ public class DrinkSelect extends AppCompatActivity {
         ArrayList<ArrayList> mixedDrinks = sortDrinks(this.mixedDrinks);
 
 
-        secondLevelAdapter = new SecondLevelAdapter(this, mixedDrinks, categories, "", 3);
+        secondLevelAdapter = new SecondLevelAdapter(getContext(), mixedDrinks, categories, "", 3);
         expandableListView.setAdapter(secondLevelAdapter);
         expandableListView.setOnGroupExpandListener(
             new ExpandableListView.OnGroupExpandListener() {
@@ -140,8 +131,9 @@ public class DrinkSelect extends AppCompatActivity {
     }
 
     private void setUpRecycler() {
-        RecyclerView recyclerView = findViewById(R.id.filterRecyclerView);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false );
+        RecyclerView recyclerView = getView().findViewById(R.id.filterRecyclerView);
+        LinearLayoutManager
+            mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false );
         recyclerView.setLayoutManager(mLayoutManager);
 
         ArrayList<String> filters = new ArrayList<>();
@@ -155,7 +147,8 @@ public class DrinkSelect extends AppCompatActivity {
             rowTypes.add(0);
         }
 
-        BaseRecycleViewAdapter adapter = new BaseRecycleViewAdapter(filters, rowTypes, this);
+        BaseRecycleViewAdapter adapter = new BaseRecycleViewAdapter(filters, rowTypes, getContext());
         recyclerView.setAdapter(adapter);
     }
+
 }

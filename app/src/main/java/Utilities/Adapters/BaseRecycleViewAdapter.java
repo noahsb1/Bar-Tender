@@ -1,8 +1,8 @@
 package Utilities.Adapters;
 
+import Fragments.Inventory;
 import Objects.MixedDrink;
 import Objects.RowType;
-import Screens.Inventory;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;

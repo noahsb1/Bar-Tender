@@ -1,5 +1,6 @@
 package Screens;
 
+import Fragments.Inventory;
 import Utilities.ErrorDisplay;
 import android.content.Intent;
 import android.os.AsyncTask;
