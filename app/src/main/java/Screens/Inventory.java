@@ -5,7 +5,12 @@ import Utilities.Adapters.ThreeLevelListAdapter;
 import Utilities.GitAccess;
 import Utilities.InternalMemory;
 import Utilities.SetToArrayList;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.widget.Button;
 import android.widget.ExpandableListView;
@@ -14,6 +19,7 @@ import android.os.Bundle;
 import com.example.bartender.R;
 import android.util.Base64;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.*;
 
@@ -83,6 +89,7 @@ public class Inventory extends AppCompatActivity {
             intent.putExtra("mixedDrinks", mixedDrinks);
             intent.putExtra("inventoryList", liquorsInInventoryAsList);
             intent.putExtra("categoryList", subcategoriesOfLiquorsInInventoryAsList);
+            intent.putExtra("categories", categories);
             startActivity(intent);
             this.finish();
         });
@@ -108,6 +115,7 @@ public class Inventory extends AppCompatActivity {
             return null;
         }
 
+        @SuppressLint("WrongThread")
         @Override
         protected void onPostExecute(ArrayList<String[]> string) {
             String[] drinks = string.get(0);
@@ -120,7 +128,14 @@ public class Inventory extends AppCompatActivity {
                     mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3],
                                                    Base64.decode(temp2[4], Base64.DEFAULT)));
                 } else {
-                    mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3], null));
+                    Resources res = getResources();
+                    Drawable d = res.getDrawable(R.drawable.ic_question_mark_desktop_wallpaper_grey_computer_icon__2_);
+                    Bitmap bitmap = ((BitmapDrawable)d).getBitmap();
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    byte[] bitmapdata = stream.toByteArray();
+
+                    mixedDrinks.add(new MixedDrink(temp2[0], temp2[1], temp2[2], temp2[3], bitmapdata));
                 }
             }
 

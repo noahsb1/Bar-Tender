@@ -15,12 +15,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
+import javax.crypto.AEADBadTagException;
 import java.util.ArrayList;
 
 public class DrinkSelect extends AppCompatActivity {
     private ArrayList<MixedDrink> mixedDrinks;
     private ArrayList<String> liquorsInInventoryAsList;
     private ArrayList<String> subcategoriesOfLiquorsInInventoryAsList;
+    private ArrayList<String> categories;
     private ExpandableListView expandableListView;
     private SecondLevelAdapter secondLevelAdapter;
 
@@ -33,9 +35,11 @@ public class DrinkSelect extends AppCompatActivity {
         Button backButton = findViewById(R.id.backButton3);
         SearchView searchView = findViewById(R.id.searchBar);
 
+
         mixedDrinks = (ArrayList<MixedDrink>) extras.get("mixedDrinks");
         liquorsInInventoryAsList = (ArrayList<String>) extras.get("inventoryList");
         subcategoriesOfLiquorsInInventoryAsList = (ArrayList<String>) extras.get("categoryList");
+        categories = (ArrayList<String>) extras.get("categories");
         ArrayList<Integer> rowTypes = new ArrayList<>();
         for (int i = 0; i < mixedDrinks.size(); i++) {
             rowTypes.add(i, 2);
@@ -55,6 +59,7 @@ public class DrinkSelect extends AppCompatActivity {
         });
 
         setUpAdapter();
+        setUpRecycler();
 
         // Define action on back button press
         backButton.setOnClickListener(view -> {
@@ -132,5 +137,25 @@ public class DrinkSelect extends AppCompatActivity {
         }
 
         return mixedDrinks;
+    }
+
+    private void setUpRecycler() {
+        RecyclerView recyclerView = findViewById(R.id.filterRecyclerView);
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false );
+        recyclerView.setLayoutManager(mLayoutManager);
+
+        ArrayList<String> filters = new ArrayList<>();
+        filters.add("Vodka");
+        filters.add("Whiskey");
+        filters.add("Rum");
+        filters.add("Tequila");
+        filters.add("Liqueur");
+        ArrayList<Integer> rowTypes = new ArrayList<>();
+        for (int j = 0; j < filters.size(); j++) {
+            rowTypes.add(0);
+        }
+
+        BaseRecycleViewAdapter adapter = new BaseRecycleViewAdapter(filters, rowTypes, this);
+        recyclerView.setAdapter(adapter);
     }
 }
