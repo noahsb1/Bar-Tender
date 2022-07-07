@@ -3,16 +3,16 @@
               xmlns:tools="http://schemas.android.com/tools" android:layout_width="wrap_content"
               android:layout_height="46dp" tools:ignore="MissingDefaultResource">
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
             android:layout_width="100dp"
             android:layout_height="40dp"
             android:id="@+id/filterButton"
-            android:textColor="#FFFFFF"
+            android:textColor="#000000"
             android:layout_marginLeft="4dp"
             android:layout_marginRight="4dp"
             android:layout_gravity="center"
             android:text="textBox"
             android:textSize="12sp"
-            android:background="@drawable/pillbutton_background"/>
+            android:background="@drawable/pillbutton_background_white"/>
 
 </LinearLayout>

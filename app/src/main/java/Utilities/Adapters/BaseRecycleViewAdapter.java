@@ -1,5 +1,6 @@
 package Utilities.Adapters;
 
+import Fragments.DrinkMenu;
 import Fragments.Inventory;
 import Objects.MixedDrink;
 import Objects.RowType;
@@ -135,10 +136,20 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             FilterButtonViewHolder filterButtonViewHolder = (FilterButtonViewHolder) holder;
             filterButtonViewHolder.button.setBackgroundColor(Color.WHITE);
             filterButtonViewHolder.button.setText((String) this.children.get(position));
-            filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background);
+            filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background_white);
+
+            if (DrinkMenu.getFilterButtonArray().contains(filterButtonViewHolder.button.getText().toString())) {
+                filterButtonViewHolder.button.setBackgroundColor(Color.GRAY);
+            }
 
             filterButtonViewHolder.setItemClickListener((v, pos) -> {
-
+                if (DrinkMenu.getFilterButtonArray().contains(filterButtonViewHolder.button.getText().toString())) {
+                    filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background_white);
+                    DrinkMenu.removeFromFilterButtonArray(filterButtonViewHolder.button.getText().toString());
+                } else {
+                    filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background_gray);
+                    DrinkMenu.addToFilterButtonArray(filterButtonViewHolder.button.getText().toString());
+                }
             });
         }
     }

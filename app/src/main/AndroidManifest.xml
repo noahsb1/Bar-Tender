@@ -20,10 +20,12 @@
 
         <activity
                 android:name="Screens.LiquorSelect"
-                android:exported="true"/>
+                android:exported="true"
+                android:windowSoftInputMode="adjustPan"/>
         <activity
                 android:name="Screens.Combined"
-                android:exported="true" android:windowSoftInputMode="adjustPan">
+                android:exported="true"
+                android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

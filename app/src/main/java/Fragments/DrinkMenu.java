@@ -16,14 +16,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.bartender.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 
 public class DrinkMenu extends Fragment {
-    private ArrayList<MixedDrink> mixedDrinks;
-    private ArrayList<String> liquorsInInventoryAsList;
-    private ArrayList<String> subcategoriesOfLiquorsInInventoryAsList;
-    private ExpandableListView expandableListView;
-    private SecondLevelAdapter secondLevelAdapter;
+    private static ArrayList<MixedDrink> mixedDrinks;
+    private static ArrayList<String> liquorsInInventoryAsList;
+    private static ArrayList<String> subcategoriesOfLiquorsInInventoryAsList;
+    private static ExpandableListView expandableListView;
+    private static SecondLevelAdapter secondLevelAdapter;
+    private static ArrayList<String> filterButtonArray = new ArrayList<>();
 
     public DrinkMenu() {
         // Required empty public constructor
@@ -59,16 +61,23 @@ public class DrinkMenu extends Fragment {
 
         setUpAdapter();
         setUpRecycler();
-
     }
 
-    private void filter(String text) {
+    private static void filter(String text) {
         ArrayList<MixedDrink> filteredlist = new ArrayList<>();
 
-        for (MixedDrink item : mixedDrinks) {
-            if (item.getName().toLowerCase().contains(text.toLowerCase())) {
-                filteredlist.add(item);
+        if (!filterButtonArray.isEmpty()) {
+            for (MixedDrink item : mixedDrinks) {
+                for (String str : filterButtonArray) {
+                    if (item.getCategoriesOfIngredients().contains(str.toLowerCase())) {
+                        if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                            filteredlist.add(item);
+                        }
+                    }
+                }
             }
+        } else {
+            filteredlist.addAll(mixedDrinks);
         }
         secondLevelAdapter.filterList(sortDrinks(filteredlist));
     }
@@ -98,7 +107,7 @@ public class DrinkMenu extends Fragment {
             });
     }
 
-    private ArrayList<ArrayList> sortDrinks(ArrayList<MixedDrink> mixedDrinksArrays) {
+    private static ArrayList<ArrayList> sortDrinks(ArrayList<MixedDrink> mixedDrinksArrays) {
         ArrayList<ArrayList> mixedDrinks =  new ArrayList<>();
         mixedDrinks.add(0, new ArrayList<>());
         mixedDrinks.get(0).add(new ArrayList<>());
@@ -132,6 +141,7 @@ public class DrinkMenu extends Fragment {
 
     private void setUpRecycler() {
         RecyclerView recyclerView = getView().findViewById(R.id.filterRecyclerView);
+        recyclerView.requestFocus();
         LinearLayoutManager
             mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false );
         recyclerView.setLayoutManager(mLayoutManager);
@@ -151,4 +161,19 @@ public class DrinkMenu extends Fragment {
         recyclerView.setAdapter(adapter);
     }
 
+    public static ArrayList<String> getFilterButtonArray() {
+        return filterButtonArray;
+    }
+
+    public static void addToFilterButtonArray(String str) {
+        if (!filterButtonArray.contains(str)) {
+            filterButtonArray.add(str);
+        }
+        filter("");
+    }
+
+    public static void removeFromFilterButtonArray(String str) {
+        filterButtonArray.remove(str);
+        filter("");
+    }
 }

@@ -36,6 +36,11 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         this.select = select;
     }
 
+    public void filterList(ArrayList<ArrayList<String>> filterllist) {
+        subCategories = filterllist;
+        notifyDataSetChanged();
+    }
+
     @Override
     public int getGroupCount() {
         return categories.size();
@@ -48,7 +53,7 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int i) {
-        return 1;
+        return categories.get(i);
     }
 
     @Override
@@ -77,6 +82,11 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         view = inflater.inflate(R.layout.expandableviewrow_first, null);
         TextView text = view.findViewById(R.id.rowParentText);
         text.setText(this.categories.get(i));
+        if (select == 1 || select == 2) {
+            view.findViewById(R.id.rowParentText).setPadding(0,0,0,0);
+            text.setText(getGroup(i).toString() + " (" + subCategories.get(i).size() + ")");
+        }
+
 
         if(b) {
             view.findViewById(R.id.ivGroupIndicator1).setBackground(
@@ -102,7 +112,9 @@ public class ThreeLevelListAdapter extends BaseExpandableListAdapter {
         Collections.sort(temp1);
 
         for(String str : temp1) {
-            childData.add(secondLevelData.get(str));
+            if (subCategoryList.contains(str)) {
+                childData.add(secondLevelData.get(str));
+            }
         }
 
         secondLevelExpandableListView.setAdapter(new SecondLevelAdapter(context, childData, subCategoryList,

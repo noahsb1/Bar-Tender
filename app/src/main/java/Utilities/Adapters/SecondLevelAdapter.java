@@ -85,6 +85,8 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
         if (select == 3) {
             view.findViewById(R.id.rowSecondText).setPadding(0,0,0,0);
             textView.setText(getGroup(i).toString() + " (" + ((ArrayList) data.get(i).get(0)).size() + ")");
+        } else if (select == 1 | select == 2) {
+            textView.setText(getGroup(i).toString() + " (" + ((ArrayList<String>) data.get(i)).size() + ")");
         }
 
         if(b) {

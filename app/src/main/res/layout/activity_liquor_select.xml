@@ -41,6 +41,9 @@
                     android:layout_height="wrap_content" android:id="@+id/textView3" android:layout_weight="1"
                     android:textColor="#000000" android:textSize="20sp" android:layout_marginLeft="8dp"/>
         </LinearLayout>
+        <SearchView
+                android:layout_width="match_parent"
+                android:layout_height="0dp" android:layout_weight="1" android:id="@+id/liquorSelectSearch"/>
         <LinearLayout
                 android:orientation="vertical"
                 android:layout_width="match_parent"

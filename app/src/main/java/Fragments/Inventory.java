@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.widget.Button;
 import android.widget.ExpandableListView;
+import android.widget.SearchView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -44,6 +45,7 @@ public class Inventory extends Fragment {
     private ArrayList<String> categories = new ArrayList<>();
     private final ArrayList<ArrayList<String>> secondLevel = new ArrayList<>();
     private ExpandableListView expandableListView;
+    private ThreeLevelListAdapter threeLevelListAdapter;
 
     public Inventory() {
         // Required empty public constructor
@@ -76,6 +78,20 @@ public class Inventory extends Fragment {
 
         // Define buttons
         Button addToInventory = view.findViewById(R.id.addToInventory);
+        SearchView searchView = view.findViewById(R.id.inventorySearchBar);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                filter(newText);
+                return false;
+            }
+        });
 
         // Execute AsyncTask to access internet
         gitCall gitCall = new gitCall();
@@ -178,6 +194,20 @@ public class Inventory extends Fragment {
         return liquorsInInventory;
     }
 
+    private void filter(String text) {
+        ArrayList<ArrayList<String>> filteredlist = new ArrayList<>();
+
+        for (int i = 0; i < secondLevel.size(); i++) {
+            filteredlist.add(i, new ArrayList<>());
+            for (int j = 0; j < secondLevel.get(i).size(); j++) {
+                if (secondLevel.get(i).get(j).toLowerCase().contains(text.toLowerCase())) {
+                    filteredlist.get(i).add(secondLevel.get(i).get(j));
+                }
+            }
+        }
+        threeLevelListAdapter.filterList(filteredlist);
+    }
+
     private void setUpAdapter() {
         for (String str : categories) {
             secondLevel.add(SetToArrayList.setToArrayList(liquorsInInventory.get(str).keySet()));
@@ -185,8 +215,7 @@ public class Inventory extends Fragment {
         }
 
         expandableListView = getView().findViewById(R.id.expandable_listview1);
-        ThreeLevelListAdapter
-            threeLevelListAdapter = new ThreeLevelListAdapter(getContext(), categories, secondLevel, data, 2);
+        threeLevelListAdapter = new ThreeLevelListAdapter(getContext(), categories, secondLevel, data, 2);
         expandableListView.setAdapter(threeLevelListAdapter);
         expandableListView.setOnGroupExpandListener(
             new ExpandableListView.OnGroupExpandListener() {
