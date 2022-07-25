@@ -3,9 +3,10 @@ package Fragments;
 import Objects.MixedDrink;
 import Utilities.Adapters.BaseRecycleViewAdapter;
 import Utilities.Adapters.SecondLevelAdapter;
+import Utilities.Adapters.SpinnerAdapter;
+import Utilities.StateVO;
 import android.os.Bundle;
-import android.widget.ExpandableListView;
-import android.widget.SearchView;
+import android.widget.*;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,13 +20,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class DrinkMenu extends Fragment {
+public class DrinkMenu extends Fragment implements AdapterView.OnItemSelectedListener {
     private static ArrayList<MixedDrink> mixedDrinks;
     private static ArrayList<String> liquorsInInventoryAsList;
     private static ArrayList<String> subcategoriesOfLiquorsInInventoryAsList;
     private static ExpandableListView expandableListView;
     private static SecondLevelAdapter secondLevelAdapter;
     private static ArrayList<String> filterButtonArray = new ArrayList<>();
+    private static Spinner spinner;
 
     public DrinkMenu() {
         // Required empty public constructor
@@ -41,6 +43,8 @@ public class DrinkMenu extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         SearchView searchView = view.findViewById(R.id.searchBar);
+        spinner = view.findViewById(R.id.spinner);
+        spinner.setOnItemSelectedListener(this);
 
         mixedDrinks = Inventory.getMixedDrinks();
         liquorsInInventoryAsList = Inventory.getLiquorsInInventoryAsList();
@@ -60,7 +64,22 @@ public class DrinkMenu extends Fragment {
         });
 
         setUpAdapter();
-        setUpRecycler();
+        setUpSpinner();
+    }
+
+    private void setUpSpinner() {
+        String[] filters = {"Liquor Filters","Vodka", "Whiskey", "Rum", "Tequila", "Liqueur"};
+
+        ArrayList<StateVO> listVOs = new ArrayList<>();
+        for (int i = 0; i < filters.length; i++) {
+            StateVO stateVO = new StateVO();
+            stateVO.setTitle(filters[i]);
+            stateVO.setSelected(false);
+            listVOs.add(stateVO);
+        }
+
+        SpinnerAdapter myAdapter = new SpinnerAdapter(getContext(), 0, listVOs);
+        spinner.setAdapter(myAdapter);
     }
 
     private static void filter(String text) {
@@ -77,7 +96,11 @@ public class DrinkMenu extends Fragment {
                 }
             }
         } else {
-            filteredlist.addAll(mixedDrinks);
+            for (MixedDrink item : mixedDrinks) {
+                if (item.getName().toLowerCase().contains(text.toLowerCase())) {
+                    filteredlist.add(item);
+                }
+            }
         }
         secondLevelAdapter.filterList(sortDrinks(filteredlist));
     }
@@ -139,28 +162,6 @@ public class DrinkMenu extends Fragment {
         return mixedDrinks;
     }
 
-    private void setUpRecycler() {
-        RecyclerView recyclerView = getView().findViewById(R.id.filterRecyclerView);
-        recyclerView.requestFocus();
-        LinearLayoutManager
-            mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false );
-        recyclerView.setLayoutManager(mLayoutManager);
-
-        ArrayList<String> filters = new ArrayList<>();
-        filters.add("Vodka");
-        filters.add("Whiskey");
-        filters.add("Rum");
-        filters.add("Tequila");
-        filters.add("Liqueur");
-        ArrayList<Integer> rowTypes = new ArrayList<>();
-        for (int j = 0; j < filters.size(); j++) {
-            rowTypes.add(0);
-        }
-
-        BaseRecycleViewAdapter adapter = new BaseRecycleViewAdapter(filters, rowTypes, getContext());
-        recyclerView.setAdapter(adapter);
-    }
-
     public static ArrayList<String> getFilterButtonArray() {
         return filterButtonArray;
     }
@@ -175,5 +176,15 @@ public class DrinkMenu extends Fragment {
     public static void removeFromFilterButtonArray(String str) {
         filterButtonArray.remove(str);
         filter("");
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
     }
 }

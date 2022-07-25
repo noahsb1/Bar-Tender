@@ -11,10 +11,9 @@ public class GitAccess {
      * @return string from website
      * @throws IOException if website can't be reached
      */
-    public static String[] access(String str) throws IOException {
+    public static String access(String str) throws IOException {
         URL url = new URL(str);
         Scanner s = new Scanner(url.openStream());
-        String[] temp = s.nextLine().split("!");
-        return temp;
+        return s.nextLine();
     }
 }

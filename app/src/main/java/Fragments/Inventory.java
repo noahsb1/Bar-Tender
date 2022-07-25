@@ -4,6 +4,7 @@ import Objects.MixedDrink;
 import Screens.Combined;
 import Screens.LiquorSelect;
 import Utilities.Adapters.ThreeLevelListAdapter;
+import Utilities.ErrorDisplay;
 import Utilities.GitAccess;
 import Utilities.InternalMemory;
 import Utilities.SetToArrayList;
@@ -115,28 +116,39 @@ public class Inventory extends Fragment {
     /**
      * AsyncTask to look at github and pull drink menu
      */
-    private class gitCall extends AsyncTask<Void, Void, ArrayList<String[]>> {
+    private class gitCall extends AsyncTask<Void, Void, ArrayList<String>> {
         @Override
-        protected ArrayList<String[]> doInBackground(Void... params) {
+        protected ArrayList<String> doInBackground(Void... params) {
+            ArrayList<String> rtn = new ArrayList<>();
+            String temp1 = "";
+            String temp2 = "";
             try {
-                ArrayList<String[]> rtn = new ArrayList<>();
-                String[] temp1 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/drinks.txt");
-                String[] temp2 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/liquorList.txt");
+                temp1 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/drinks.txt");
+                temp2 = GitAccess.access("https://raw.githubusercontent.com/noahsb1/Bar-Tender/main/app/Text%20Files/liquorList.txt");
+                InternalMemory.addToInventory(getActivity(), temp1, "drinks.txt");
+                InternalMemory.addToInventory(getActivity(), temp2, "liquorList.txt");
                 rtn.add(temp1);
                 rtn.add(temp2);
 
                 return rtn;
             } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    temp1 = InternalMemory.getStoredInventory(getActivity(), "drinks.txt");
+                    temp2 = InternalMemory.getStoredInventory(getActivity(), "liquorList.txt");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+                rtn.add(temp1);
+                rtn.add(temp2);
             }
             return null;
         }
 
         @SuppressLint("WrongThread")
         @Override
-        protected void onPostExecute(ArrayList<String[]> string) {
-            String[] drinks = string.get(0);
-            String[] liquorArray = string.get(1);
+        protected void onPostExecute(ArrayList<String> string) {
+            String[] drinks = string.get(0).split("!");
+            String[] liquorArray = string.get(1).split("!");
 
             // Turn drink strings into mixed drink objects
             for (String drink : drinks) {

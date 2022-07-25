@@ -6,7 +6,7 @@
               android:padding="10dp">
 
     <CheckBox
-            android:id="@+id/rowThirdCheckBox"
+            android:id="@+id/spinnerCheckbox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="0dp"

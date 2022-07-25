@@ -112,7 +112,7 @@ public class SecondLevelAdapter extends BaseExpandableListAdapter {
 
         if (select == 1) {
             view = inflater.inflate(R.layout.expandableviewrow_thirdcheck, null);
-            CheckBox checkBox = view.findViewById(R.id.rowThirdCheckBox);
+            CheckBox checkBox = view.findViewById(R.id.spinnerCheckbox);
 
             checkBox.setText(txt);
 

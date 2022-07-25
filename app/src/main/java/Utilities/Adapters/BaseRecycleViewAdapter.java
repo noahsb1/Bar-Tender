@@ -64,10 +64,7 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         } else if (viewType == 2) {
             View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_cardview, parent, false);
             return new CardViewHolder(rowItem);
-        } else if (viewType == 0) {
-            View rowItem = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_filterbutton, parent, false);
-            return new FilterButtonViewHolder(rowItem);
-        }else {
+        } else {
             return null;
         }
     }
@@ -132,25 +129,6 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
                 popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
             });
-        } else if (holder instanceof FilterButtonViewHolder) {
-            FilterButtonViewHolder filterButtonViewHolder = (FilterButtonViewHolder) holder;
-            filterButtonViewHolder.button.setBackgroundColor(Color.WHITE);
-            filterButtonViewHolder.button.setText((String) this.children.get(position));
-            filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background_white);
-
-            if (DrinkMenu.getFilterButtonArray().contains(filterButtonViewHolder.button.getText().toString())) {
-                filterButtonViewHolder.button.setBackgroundColor(Color.GRAY);
-            }
-
-            filterButtonViewHolder.setItemClickListener((v, pos) -> {
-                if (DrinkMenu.getFilterButtonArray().contains(filterButtonViewHolder.button.getText().toString())) {
-                    filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background_white);
-                    DrinkMenu.removeFromFilterButtonArray(filterButtonViewHolder.button.getText().toString());
-                } else {
-                    filterButtonViewHolder.button.setBackgroundResource(R.drawable.pillbutton_background_gray);
-                    DrinkMenu.addToFilterButtonArray(filterButtonViewHolder.button.getText().toString());
-                }
-            });
         }
     }
 
@@ -208,31 +186,6 @@ public class BaseRecycleViewAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
 
         public void setItemClickListener(CardViewHolder.ItemClickListener ic) {
-            this.itemClickListener = ic;
-        }
-
-        @Override
-        public void onClick(View v) {
-            this.itemClickListener.onItemClick(v, getLayoutPosition());
-        }
-
-        public interface ItemClickListener {
-            void onItemClick(View v, int pos);
-        }
-    }
-
-    public static class FilterButtonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private Button button;
-        private View view;
-        private ItemClickListener itemClickListener;
-
-        public FilterButtonViewHolder(View view) {
-            super(view);
-            this.button = view.findViewById(R.id.filterButton);
-            this.button.setOnClickListener(this);
-        }
-
-        public void setItemClickListener(ItemClickListener ic) {
             this.itemClickListener = ic;
         }
 
