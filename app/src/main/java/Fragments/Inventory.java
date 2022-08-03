@@ -141,7 +141,7 @@ public class Inventory extends Fragment {
                 rtn.add(temp1);
                 rtn.add(temp2);
             }
-            return null;
+            return rtn;
         }
 
         @SuppressLint("WrongThread")
